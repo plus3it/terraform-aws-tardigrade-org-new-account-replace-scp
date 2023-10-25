@@ -12,7 +12,6 @@ module "replace_scp" {
   project_name  = local.project
   detach_scp_id = "p-detach"
   attach_scp_id = "p-attach"
-  dry_run       = true
   log_level     = "DEBUG"
   tags          = local.tags
 }

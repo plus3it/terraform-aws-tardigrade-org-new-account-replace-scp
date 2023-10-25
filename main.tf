@@ -30,7 +30,6 @@ module "lambda" {
   environment_variables = {
     ATTACH_SCP_ID = var.attach_scp_id
     DETACH_SCP_ID = var.detach_scp_id
-    DRY_RUN       = var.dry_run
     LOG_LEVEL     = var.log_level
   }
 

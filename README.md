@@ -49,7 +49,7 @@ No outputs.
 Steps to run via the CLI
 
 1. Install and configure aws cli.
-2. Set AWS_PROFILE and AWS_DEFAULT_REGION (account and region that can assume the role and run commands from)
+2. Set AWS_PROFILE and AWS_DEFAULT_REGION (account and region that can run commands to attach and detach organizational policies)
 3. Review the options for the script and run
 
 ### Script Options
@@ -58,10 +58,6 @@ Steps to run via the CLI
 Supported Environment Variables:
     'LOG_LEVEL': defaults to 'info'
         - set the desired log level ('error', 'warning', 'info' or 'debug')
-
-    'DRY_RUN': defaults to 'true'
-        - set whether actions should be simulated or live
-        - value of 'true' (case insensitive) will be simulated.
 
     'DETACH_SCP_ID':
         -sets id of the policy to detach

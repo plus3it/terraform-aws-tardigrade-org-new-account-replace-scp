@@ -37,12 +37,6 @@ variable "event_types" {
   }
 }
 
-variable "dry_run" {
-  description = "Boolean toggle to control the dry-run mode of the lambda function"
-  type        = bool
-  default     = true
-}
-
 variable "lambda" {
   description = "Object of optional attributes passed on to the lambda module"
   type = object({
