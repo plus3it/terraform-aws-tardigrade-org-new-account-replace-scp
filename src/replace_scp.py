@@ -51,6 +51,7 @@ log = logging.getLogger(__name__)
 # Get client
 org_client = boto3.client("organizations")
 
+
 def lambda_handler(event, context):  # pylint: disable=unused-argument
     """Replace scp policy lambda handler."""
     log.debug("AWS Event:%s", event)
@@ -62,6 +63,7 @@ def replace_scp(account_id):
     """Replace scp policy from either a lambda or main method."""
     org_client.detach_policy(PolicyId=DETACH_SCP_ID, TargetId=account_id)
     org_client.attach_policy(PolicyId=ATTACH_SCP_ID, TargetId=account_id)
+
 
 if __name__ == "__main__":
 
