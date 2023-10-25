@@ -1,5 +1,4 @@
 locals {
-  detach_scp_id = "p-"
 
   project = "test-replace-scp-${random_string.id.result}"
 
@@ -8,21 +7,14 @@ locals {
   }
 }
 
-module "test_scp" {
-  source   = "./scp"
-  scp_name = "${local.project}-policy"
-  tags     = local.tags
-}
-
 module "replace_scp" {
-  source           = "../../"
-  project_name     = local.project
-  assume_role_name = aws_iam_role.assume_role.name
-  detach_scp_id    = local.detach_scp_id
-  attach_scp_id    = module.test_scp.scp_id
-  dry_run          = true
-  log_level        = "DEBUG"
-  tags             = local.tags
+  source        = "../../"
+  project_name  = local.project
+  detach_scp_id = "p-detach"
+  attach_scp_id = "p-attach"
+  dry_run       = true
+  log_level     = "DEBUG"
+  tags          = local.tags
 }
 
 

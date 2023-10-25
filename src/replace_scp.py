@@ -17,10 +17,6 @@ import os
 import sys
 
 import boto3
-from aws_assume_role_lib import (  # pylint: disable=import-error
-    assume_role,
-    generate_lambda_session_name,
-)
 
 # Standard logging config
 DEFAULT_LOG_LEVEL = logging.INFO
@@ -35,7 +31,6 @@ LOG_LEVELS = collections.defaultdict(
     },
 )
 
-ASSUME_ROLE_NAME = os.environ.get("ASSUME_ROLE_NAME", "OrganizationAccountAccessRole")
 ATTACH_SCP_ID = os.environ["ATTACH_SCP_ID"]
 DETACH_SCP_ID = os.environ["DETACH_SCP_ID"]
 DRY_RUN = os.environ.get("DRY_RUN", "true").lower() == "true"
@@ -65,68 +60,21 @@ def lambda_handler(event, context):  # pylint: disable=unused-argument
 
     account_id = get_account_id(event)
 
-    assume_role_arn = f"arn:{get_partition()}:iam::{account_id}:role/{ASSUME_ROLE_NAME}"
-
-    replace_scp(assume_role_arn, account_id)
+    replace_scp(account_id)
 
 
-def replace_scp(assume_role_arn, account_id):
+def replace_scp(account_id):
     """Replace scp policy from either a lambda or main method."""
-    org_client = get_boto3_clients(assume_role_arn, account_id)
+    org_client = SESSION.client("organizations")
 
     org_client.detach_policy(PolicyId=DETACH_SCP_ID, TargetId=account_id)
 
     org_client.attach_policy(PolicyId=ATTACH_SCP_ID, TargetId=account_id)
 
 
-def get_boto3_clients(assume_role_arn, account_id):
-    """Get the organization client."""
-    # Assume the session
-    assumed_role_session = get_assumed_role_session(account_id, assume_role_arn)
-    # Create the organization client
-    org_client = assumed_role_session.client("organizations")
-    return org_client
-
-
-def get_new_account_id(event):
-    """Return account id for new account events."""
-    return event["detail"]["serviceEventDetails"]["createAccountStatus"]["accountId"]
-
-
-def get_invite_account_id(event):
-    """Return account id for invite account events."""
-    return event["detail"]["requestParameters"]["target"]["id"]
-
-
 def get_account_id(event):
-    """Return account id for supported events."""
-    event_name = event["detail"]["eventName"]
-    get_account_id_strategy = {
-        "CreateAccountResult": get_new_account_id,
-        "InviteAccountToOrganization": get_invite_account_id,
-    }
-    return get_account_id_strategy[event_name](event)
-
-
-def get_assumed_role_session(account_id, role_arn):
-    """Get boto3 session."""
-    function_name = os.environ.get(
-        "AWS_LAMBDA_FUNCTION_NAME", os.path.basename(__file__)
-    )
-
-    role_session_name = generate_lambda_session_name(function_name)
-
-    # Assume the session
-    assumed_role_session = assume_role(
-        SESSION, role_arn, RoleSessionName=role_session_name, validate=False
-    )
-    # do stuff with the assumed role using assumed_role_session
-    log.debug(
-        "Assumed identity for account %s is %s",
-        account_id,
-        assumed_role_session.client("sts").get_caller_identity()["Arn"],
-    )
-    return assumed_role_session
+    """Return account id."""
+    return event["detail"]["recipientAccountId"]
 
 
 def get_partition():
@@ -135,25 +83,14 @@ def get_partition():
     return sts.get_caller_identity()["Arn"].split(":")[1]
 
 
-def cli_main(target_account_id, assume_role_arn=None, assume_role_name=None):
+def cli_main(target_account_id):
     """Process cli assume_role_name arg and pass to main."""
-    log.debug(
-        "CLI - target_account_id=%s assume_role_arn=%s assume_role_name=%s",
-        target_account_id,
-        assume_role_arn,
-        assume_role_name,
-    )
+    log.debug("CLI - target_account_id=%s", target_account_id)
 
-    if assume_role_name:
-        assume_role_arn = (
-            f"arn:{get_partition()}:iam::{target_account_id}:role/{assume_role_name}"
-        )
-        log.info("assume_role_arn for provided role name is '%s'", assume_role_arn)
-
-    main(target_account_id, assume_role_arn)
+    main(target_account_id)
 
 
-def main(target_account_id, assume_role_arn):
+def main(target_account_id):
     """Assume role and replace default scp."""
     log.debug(
         "Main identity is %s",
@@ -161,7 +98,6 @@ def main(target_account_id, assume_role_arn):
     )
 
     replace_scp(
-        assume_role_arn,
         target_account_id,
     )
 
@@ -198,17 +134,6 @@ Supported Environment Variables:
             required=True,
             type=str,
             help="Account number to delete default cloudtrail resources in",
-        )
-        mut_x_group = parser.add_mutually_exclusive_group(required=True)
-        mut_x_group.add_argument(
-            "--assume-role-arn",
-            type=str,
-            help="ARN of IAM role to assume in the target account (case sensitive)",
-        )
-        mut_x_group.add_argument(
-            "--assume-role-name",
-            type=str,
-            help="Name of IAM role to assume in the target account (case sensitive)",
         )
 
         return parser.parse_args()

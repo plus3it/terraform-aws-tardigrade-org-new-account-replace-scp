@@ -31,10 +31,9 @@ No requirements.
 | <a name="input_attach_scp_id"></a> [attach\_scp\_id](#input\_attach\_scp\_id) | ID of the SCP to attach | `string` | n/a | yes |
 | <a name="input_detach_scp_id"></a> [detach\_scp\_id](#input\_detach\_scp\_id) | ID of the SCP to detach | `string` | n/a | yes |
 | <a name="input_project_name"></a> [project\_name](#input\_project\_name) | Project name to prefix resources with | `string` | n/a | yes |
-| <a name="input_assume_role_name"></a> [assume\_role\_name](#input\_assume\_role\_name) | Name of the IAM role that the lambda will assume in the target account | `string` | `"OrganizationAccountAccessRole"` | no |
 | <a name="input_dry_run"></a> [dry\_run](#input\_dry\_run) | Boolean toggle to control the dry-run mode of the lambda function | `bool` | `true` | no |
 | <a name="input_event_bus_name"></a> [event\_bus\_name](#input\_event\_bus\_name) | Event bus name to create event rules in | `string` | `"default"` | no |
-| <a name="input_event_types"></a> [event\_types](#input\_event\_types) | Event types that will trigger this lambda | `set(string)` | <pre>[<br>  "CreateAccountResult",<br>  "InviteAccountToOrganization"<br>]</pre> | no |
+| <a name="input_event_types"></a> [event\_types](#input\_event\_types) | Event types that will trigger this lambda | `set(string)` | <pre>[<br>  "CreateAccount",<br>  "CreateGovCloudAccount",<br>  "InviteAccountToOrganization",<br>  "CreateOrganizationalUnit"<br>]</pre> | no |
 | <a name="input_lambda"></a> [lambda](#input\_lambda) | Object of optional attributes passed on to the lambda module | <pre>object({<br>    artifacts_dir            = optional(string, "builds")<br>    build_in_docker          = optional(bool, false)<br>    create_package           = optional(bool, true)<br>    ephemeral_storage_size   = optional(number)<br>    ignore_source_code_hash  = optional(bool, true)<br>    local_existing_package   = optional(string)<br>    memory_size              = optional(number, 128)<br>    recreate_missing_package = optional(bool, false)<br>    runtime                  = optional(string, "python3.8")<br>    s3_bucket                = optional(string)<br>    s3_existing_package      = optional(map(string))<br>    s3_prefix                = optional(string)<br>    store_on_s3              = optional(bool, false)<br>    timeout                  = optional(number, 300)<br>  })</pre> | `{}` | no |
 | <a name="input_log_level"></a> [log\_level](#input\_log\_level) | Log level for lambda | `string` | `"INFO"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags for resource | `map(string)` | `{}` | no |
@@ -77,13 +76,7 @@ required arguments:
   --target-account-id TARGET_ACCOUNT_ID
                         Account number to delete default VPC resources in
 
-  --assume-role-arn ASSUME_ROLE_ARN
-                        ARN of IAM role to assume in the target account (case sensitive)
-  OR
-  --assume-role-name ASSUME_ROLE_NAME
-                        Name of IAM role to assume in the target account (case sensitive)
-
-usage: replace_scp.py [-h] --target-account-id TARGET_ACCOUNT_ID (--assume-role-arn ASSUME_ROLE_ARN | --assume-role-name ASSUME_ROLE_NAME)
+usage: replace_scp.py [-h] --target-account-id TARGET_ACCOUNT_ID
 ```
 
 ### Sample steps to execute in venv
@@ -94,7 +87,7 @@ python3 -m venv vpc_env
 source vpc_env/bin/activate
 python3 -m pip install -U pip
 pip3 install -r src/requirements.txt
-python3 src/replace_scp.py --target-account-id=<TARGET ACCT ID> (--assume-role-arn=<ROLE ARN TO ASSUME> | --assume-role-name=<ROLE NAME TO ASSUME>)
+python3 src/replace_scp.py --target-account-id=<TARGET ACCT ID>
 deactivate
 rm -rf vpc_env
 ```

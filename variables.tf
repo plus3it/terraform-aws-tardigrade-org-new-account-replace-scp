@@ -3,12 +3,6 @@ variable "project_name" {
   type        = string
 }
 
-variable "assume_role_name" {
-  description = "Name of the IAM role that the lambda will assume in the target account"
-  type        = string
-  default     = "OrganizationAccountAccessRole"
-}
-
 variable "detach_scp_id" {
   description = "ID of the SCP to detach"
   type        = string
@@ -29,13 +23,17 @@ variable "event_types" {
   description = "Event types that will trigger this lambda"
   type        = set(string)
   default = [
-    "CreateAccountResult",
+    "CreateAccount",
+    "CreateGovCloudAccount",
     "InviteAccountToOrganization",
+    "CreateOrganizationalUnit"
   ]
 
   validation {
-    condition     = alltrue([for event in var.event_types : contains(["CreateAccountResult", "InviteAccountToOrganization"], event)])
-    error_message = "Supported event_types include only: CreateAccountResult, InviteAccountToOrganization"
+    condition = alltrue([for event in var.event_types : contains(
+      ["CreateAccount", "CreateGovCloudAccount", "InviteAccountToOrganization", "CreateOrganizationalUnit"], event
+    )])
+    error_message = "Supported event_types include only: CreateAccountResult, CreateGovCloudAccount, InviteAccountToOrganization, CreateOrganizationalUnit"
   }
 }
 

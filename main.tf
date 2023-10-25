@@ -28,11 +28,10 @@ module "lambda" {
   timeout                  = var.lambda.timeout
 
   environment_variables = {
-    ASSUME_ROLE_NAME = var.assume_role_name
-    ATTACH_SCP_ID    = var.attach_scp_id
-    DETACH_SCP_ID    = var.detach_scp_id
-    DRY_RUN          = var.dry_run
-    LOG_LEVEL        = var.log_level
+    ATTACH_SCP_ID = var.attach_scp_id
+    DETACH_SCP_ID = var.detach_scp_id
+    DRY_RUN       = var.dry_run
+    LOG_LEVEL     = var.log_level
   }
 
   source_path = [
@@ -47,17 +46,27 @@ module "lambda" {
 
 data "aws_iam_policy_document" "lambda" {
   statement {
-    sid = "AllowAssumeRole"
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
 
-    actions = [
-      "sts:AssumeRole"
-    ]
-
-    resources = [
-      "arn:${data.aws_partition.current.partition}:iam::*:role/${var.assume_role_name}"
-    ]
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
   }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "organizations:DetachPolicy",
+      "organizations:AttachPolicy"
+    ]
+
+    resources = ["*"]
+  }
+
 }
+
 
 ##############################
 # Events
@@ -66,16 +75,27 @@ locals {
   lambda_name = module.lambda.lambda_function_name
 
   event_types = {
-    CreateAccountResult = jsonencode(
+    CreateAccount = jsonencode(
       {
         "detail" : {
           "eventSource" : ["organizations.amazonaws.com"],
-          "eventName" : ["CreateAccountResult"]
-          "serviceEventDetails" : {
-            "createAccountStatus" : {
-              "state" : ["SUCCEEDED"]
-            }
-          }
+          "eventName" : ["CreateAccount"]
+        }
+      }
+    )
+    CreateGovCloudAccount = jsonencode(
+      {
+        "detail" : {
+          "eventSource" : ["organizations.amazonaws.com"],
+          "eventName" : ["CreateGovCloudAccount"]
+        }
+      }
+    )
+    CreateOrganizationalUnit = jsonencode(
+      {
+        "detail" : {
+          "eventSource" : ["organizations.amazonaws.com"],
+          "eventName" : ["CreateOrganizationalUnit"]
         }
       }
     )
