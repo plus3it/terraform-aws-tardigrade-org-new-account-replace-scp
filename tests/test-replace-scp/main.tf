@@ -29,54 +29,6 @@ module "replace_scp" {
 data "aws_caller_identity" "current" {}
 data "aws_partition" "current" {}
 
-data "aws_iam_policy_document" "iam_cloudtrail" {
-  statement {
-    actions = [
-      "cloudtrail:DescribeTrails",
-      "cloudtrail:GetTrail",
-    ]
-
-    resources = [
-      "*"
-    ]
-  }
-
-  statement {
-    actions = [
-      "cloudtrail:DeleteTrail",
-      "cloudtrail:StopLogging"
-    ]
-
-    resources = [
-      module.test_cloudtrail.cloudtrail_arn
-    ]
-  }
-
-}
-
-resource "aws_iam_role" "assume_role" {
-  name = "${local.project}-replace-scp-role"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        "Sid" : "AssumeRoleCrossAccount",
-        "Effect" : "Allow",
-        "Principal" : {
-          "AWS" : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:root"
-        },
-        "Action" : "sts:AssumeRole"
-      }
-    ]
-  })
-
-  inline_policy {
-    name   = local.project
-    policy = data.aws_iam_policy_document.iam_cloudtrail.json
-  }
-}
-
 resource "random_string" "id" {
   length  = 6
   upper   = false

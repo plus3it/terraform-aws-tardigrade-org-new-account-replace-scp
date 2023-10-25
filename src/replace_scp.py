@@ -1,7 +1,7 @@
 """Replace SCP.
 
 Purpose:
-    Replace DETACH_SCP_ID SCP with ATTACH_SCP_ID SCP defined in the associated environment variables
+    Replace DETACH_SCP_ID SCP with ATTACH_SCP_ID SCP defined in the associated env vars
 Environment Variables:
     LOG_LEVEL: (optional): sets the level for function logging
             valid input: critical, error, warning, info (default), debug
@@ -21,7 +21,6 @@ from aws_assume_role_lib import (  # pylint: disable=import-error
     assume_role,
     generate_lambda_session_name,
 )
-from botocore.exceptions import ClientError
 
 # Standard logging config
 DEFAULT_LOG_LEVEL = logging.INFO
@@ -75,16 +74,9 @@ def replace_scp(assume_role_arn, account_id):
     """Replace scp policy from either a lambda or main method."""
     org_client = get_boto3_clients(assume_role_arn, account_id)
 
-    org_client.detach_policy(
-        PolicyId=DETACH_SCP_ID,
-        TargetId=account_id
-    )
+    org_client.detach_policy(PolicyId=DETACH_SCP_ID, TargetId=account_id)
 
-    org_client.attach_policy(
-        PolicyId=ATTACH_SCP_ID,
-        TargetId=account_id
-    )
-
+    org_client.attach_policy(PolicyId=ATTACH_SCP_ID, TargetId=account_id)
 
 
 def get_boto3_clients(assume_role_arn, account_id):
