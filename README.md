@@ -74,8 +74,8 @@ options:
   -h, --help            show this help message and exit
 
 required arguments:
-  --target-account-id TARGET_ACCOUNT_ID
-                        Account number to delete default VPC resources in
+  --target-id TARGET_ID
+                        Target ID to replace policy in
 
 usage: replace_scp.py [-h] --target-account-id TARGET_ACCOUNT_ID
 ```
@@ -88,7 +88,7 @@ python3 -m venv vpc_env
 source vpc_env/bin/activate
 python3 -m pip install -U pip
 pip3 install -r src/requirements.txt
-python3 src/replace_scp.py --target-account-id=<TARGET ACCT ID>
+python3 src/replace_scp.py --target-id=<TARGET ID>
 deactivate
 rm -rf vpc_env
 ```

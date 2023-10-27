@@ -108,7 +108,7 @@ if __name__ == "__main__":
         parser = ArgumentParser(
             formatter_class=RawDescriptionHelpFormatter,
             description="""
-Replace SCP for provided target account.
+Replace SCP for provided target id.
 
 Supported Environment Variables:
     'LOG_LEVEL': defaults to 'info'
@@ -120,10 +120,10 @@ Supported Environment Variables:
         )
         required_args = parser.add_argument_group("required named arguments")
         required_args.add_argument(
-            "--target-account-id",
+            "--target-id",
             required=True,
             type=str,
-            help="Account number to delete default cloudtrail resources in",
+            help="Target id to replace scp in",
         )
 
         return parser.parse_args()
