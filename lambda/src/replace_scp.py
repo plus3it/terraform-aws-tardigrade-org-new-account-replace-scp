@@ -114,7 +114,7 @@ Supported Environment Variables:
             "--target-id",
             required=True,
             type=str,
-            help="Target id to replace scp in",
+            help="Account ID or OU ID where SCP will be replaced",
         )
 
         return parser.parse_args()
