@@ -33,29 +33,46 @@ DETACH_SCP_ID = os.environ["DETACH_SCP_ID"]
 # Get client
 org_client = boto3.client("organizations")
 
+class ReplaceSCPMaxPoliciesError(Exception):
+    """Replace SCP Error for Max Policies Attached"""
+
+class ReplaceSCPError(Exception):
+    """All Replace SCP Errors"""
+
 @LOG.inject_lambda_context(log_event=True)
 def lambda_handler(event, context):  # pylint: disable=unused-argument
     """Replace scp policy lambda handler."""
-    account_id = event["detail"]["recipientAccountId"]
-    replace_scp(account_id)
+    target_id = event["detail"]["recipientAccountId"]
+    replace_scp(target_id)
 
 
-def replace_scp(account_id):
+def replace_scp(target_id):
     """Replace scp policy from either a lambda or main method."""
 
     # Determine how many policies are attached, we can have only 5 and must have 1
     response = org_client.list_policies_for_target(
-        TargetId=account_id,
+        TargetId=target_id,
         Filter='SERVICE_CONTROL_POLICY',
     )
     num_policies = len(response['Policies'])
-    LOG.debug("Account ID %s has %s SCPs", account_id, num_policies)
-    if num_policies == 1:
-        org_client.attach_policy(PolicyId=ATTACH_SCP_ID, TargetId=account_id)
-        org_client.detach_policy(PolicyId=DETACH_SCP_ID, TargetId=account_id)
+    LOG.debug("Target ID %s has %s SCPs", target_id, num_policies)
+
+    detach_policy = next(
+        (True for item in response['Policies'] if item["Id"] == DETACH_SCP_ID),
+        False
+    )
+
+    if not detach_policy:
+        if num_policies == 5:
+            raise ReplaceSCPMaxPoliciesError("Unable to find detach policy ID")
+        org_client.attach_policy(PolicyId=ATTACH_SCP_ID, TargetId=target_id)
     else:
-        org_client.detach_policy(PolicyId=DETACH_SCP_ID, TargetId=account_id)
-        org_client.attach_policy(PolicyId=ATTACH_SCP_ID, TargetId=account_id)
+        if num_policies == 1:
+            org_client.attach_policy(PolicyId=ATTACH_SCP_ID, TargetId=target_id)
+            org_client.detach_policy(PolicyId=DETACH_SCP_ID, TargetId=target_id)
+        else:
+            org_client.detach_policy(PolicyId=DETACH_SCP_ID, TargetId=target_id)
+            org_client.attach_policy(PolicyId=ATTACH_SCP_ID, TargetId=target_id)
 
 
 if __name__ == "__main__":
