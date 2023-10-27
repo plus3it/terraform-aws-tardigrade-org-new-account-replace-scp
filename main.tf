@@ -6,7 +6,7 @@ module "lambda" {
 
   function_name = "${var.project_name}-replace-scp"
 
-  description = "Lambda function replacing detach_scp_id with attach_scp_id"
+  description = "Lambda function replacing SCP ${var.detach_scp_id} with ${var.attach_scp_id}"
   handler     = "replace_scp.lambda_handler"
   tags        = var.tags
 
