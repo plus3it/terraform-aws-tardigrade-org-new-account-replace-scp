@@ -93,13 +93,14 @@ def replace_scp(target_id):
         if num_policies == 5:
             raise ReplaceSCPMaxPoliciesError("Unable to find detach policy ID")
         org_client.attach_policy(PolicyId=ATTACH_SCP_ID, TargetId=target_id)
+        return
+
+    if num_policies == 1:
+        org_client.attach_policy(PolicyId=ATTACH_SCP_ID, TargetId=target_id)
+        org_client.detach_policy(PolicyId=DETACH_SCP_ID, TargetId=target_id)
     else:
-        if num_policies == 1:
-            org_client.attach_policy(PolicyId=ATTACH_SCP_ID, TargetId=target_id)
-            org_client.detach_policy(PolicyId=DETACH_SCP_ID, TargetId=target_id)
-        else:
-            org_client.detach_policy(PolicyId=DETACH_SCP_ID, TargetId=target_id)
-            org_client.attach_policy(PolicyId=ATTACH_SCP_ID, TargetId=target_id)
+        org_client.detach_policy(PolicyId=DETACH_SCP_ID, TargetId=target_id)
+        org_client.attach_policy(PolicyId=ATTACH_SCP_ID, TargetId=target_id)
 
 
 if __name__ == "__main__":
