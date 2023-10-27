@@ -64,19 +64,16 @@ locals {
   lambda_name = module.lambda.lambda_function_name
 
   event_types = {
-    CreateAccount = jsonencode(
+    CreateAccountResult = jsonencode(
       {
         "detail" : {
           "eventSource" : ["organizations.amazonaws.com"],
-          "eventName" : ["CreateAccount"]
-        }
-      }
-    )
-    CreateGovCloudAccount = jsonencode(
-      {
-        "detail" : {
-          "eventSource" : ["organizations.amazonaws.com"],
-          "eventName" : ["CreateGovCloudAccount"]
+          "eventName" : ["CreateAccountResult"]
+          "serviceEventDetails" : {
+            "createAccountStatus" : {
+              "state" : ["SUCCEEDED"]
+            }
+          }
         }
       }
     )
