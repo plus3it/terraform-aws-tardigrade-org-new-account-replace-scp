@@ -10,7 +10,6 @@ Environment Variables:
     ASSUME_ROLE_NAME: Name of role to assume
 """
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
-import logging
 import os
 import sys
 
@@ -51,7 +50,7 @@ def replace_scp(account_id):
     )
     num_policies = len(response['Policies'])
     LOG.debug("Account ID %s has %s SCPs", account_id, num_policies)
-    if 1<= num_policies <=4:
+    if 1 <= num_policies <= 4:
         org_client.attach_policy(PolicyId=ATTACH_SCP_ID, TargetId=account_id)
         org_client.detach_policy(PolicyId=DETACH_SCP_ID, TargetId=account_id)
     else:
