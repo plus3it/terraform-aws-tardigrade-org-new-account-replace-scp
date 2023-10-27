@@ -15,6 +15,7 @@ import logging
 import os
 import sys
 
+from aws_lambda_powertools import Logger
 import boto3
 
 # Standard logging config
@@ -51,10 +52,9 @@ log = logging.getLogger(__name__)
 # Get client
 org_client = boto3.client("organizations")
 
-
+@LOG.inject_lambda_context(log_event=True)
 def lambda_handler(event, context):  # pylint: disable=unused-argument
     """Replace scp policy lambda handler."""
-    log.debug("AWS Event:%s", event)
     account_id = event["detail"]["recipientAccountId"]
     replace_scp(account_id)
 
