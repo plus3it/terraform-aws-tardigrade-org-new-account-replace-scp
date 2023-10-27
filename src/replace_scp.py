@@ -43,8 +43,20 @@ def lambda_handler(event, context):  # pylint: disable=unused-argument
 
 def replace_scp(account_id):
     """Replace scp policy from either a lambda or main method."""
-    org_client.detach_policy(PolicyId=DETACH_SCP_ID, TargetId=account_id)
-    org_client.attach_policy(PolicyId=ATTACH_SCP_ID, TargetId=account_id)
+
+    # Determine how many policies are attached, we can have only 5 and must have 1
+    response = org_client.list_policies_for_target(
+        TargetId=account_id,
+        Filter='SERVICE_CONTROL_POLICY',
+    )
+    num_policies = len(response['Policies'])
+    LOG.debug("Account ID %s has %s SCPs", account_id, num_policies)
+    if 1<= num_policies <=4:
+        org_client.attach_policy(PolicyId=ATTACH_SCP_ID, TargetId=account_id)
+        org_client.detach_policy(PolicyId=DETACH_SCP_ID, TargetId=account_id)
+    else:
+        org_client.detach_policy(PolicyId=DETACH_SCP_ID, TargetId=account_id)
+        org_client.attach_policy(PolicyId=ATTACH_SCP_ID, TargetId=account_id)
 
 
 if __name__ == "__main__":
