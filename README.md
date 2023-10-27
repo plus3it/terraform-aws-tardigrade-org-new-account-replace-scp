@@ -13,9 +13,6 @@ replaces the default policy for that account.
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.9 |
-| <a name="requirement_external"></a> [external](#requirement\_external) | >= 1.0 |
-| <a name="requirement_local"></a> [local](#requirement\_local) | >= 1.0 |
-| <a name="requirement_null"></a> [null](#requirement\_null) | >= 2.0 |
 
 ## Providers
 
