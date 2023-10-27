@@ -10,7 +10,6 @@ Environment Variables:
     ASSUME_ROLE_NAME: Name of role to assume
 """
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
-import collections
 import logging
 import os
 import sys
@@ -19,35 +18,18 @@ from aws_lambda_powertools import Logger
 import boto3
 
 # Standard logging config
-DEFAULT_LOG_LEVEL = logging.INFO
-LOG_LEVELS = collections.defaultdict(
-    lambda: DEFAULT_LOG_LEVEL,
-    {
-        "CRITICAL": logging.CRITICAL,
-        "ERROR": logging.ERROR,
-        "WARNING": logging.WARNING,
-        "INFO": logging.INFO,
-        "DEBUG": logging.DEBUG,
-    },
+LOG_LEVEL = os.environ.get("LOG_LEVEL", "info")
+LOG = Logger(
+    service="new_account_replace_scp",
+    level=LOG_LEVEL,
+    stream=sys.stderr,
+    location="%(name)s.%(funcName)s:%(lineno)d",
+    timestamp="%(asctime)s.%(msecs)03dZ",
+    datefmt="%Y-%m-%dT%H:%M:%S",
 )
 
 ATTACH_SCP_ID = os.environ["ATTACH_SCP_ID"]
 DETACH_SCP_ID = os.environ["DETACH_SCP_ID"]
-
-# Lambda initializes a root logger that needs to be removed in order to set a
-# different logging config
-root = logging.getLogger()
-if root.handlers:
-    for handler in root.handlers:
-        root.removeHandler(handler)
-
-logging.basicConfig(
-    format="%(asctime)s.%(msecs)03dZ [%(name)s][%(levelname)-5s]: %(message)s",
-    datefmt="%Y-%m-%dT%H:%M:%S",
-    level=LOG_LEVELS[os.environ.get("LOG_LEVEL", "").lower()],
-)
-
-log = logging.getLogger(__name__)
 
 # Get client
 org_client = boto3.client("organizations")
