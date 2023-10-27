@@ -42,9 +42,32 @@ class ReplaceSCPError(Exception):
 @LOG.inject_lambda_context(log_event=True)
 def lambda_handler(event, context):  # pylint: disable=unused-argument
     """Replace scp policy lambda handler."""
-    target_id = event["detail"]["recipientAccountId"]
+    target_id = get_target_id(event)
     replace_scp(target_id)
 
+
+def get_new_account_id(event):
+    """Return account id for new account events."""
+    return event["detail"]["serviceEventDetails"]["createAccountStatus"]["accountId"]
+
+
+def get_invite_org_target_id(event):
+    """Return target id for invite to org events."""
+    return event["detail"]["requestParameters"]["target"]["id"]
+
+def get_create_org_target_id(event):
+    """Return target id for create org events."""
+    return event["detail"]["recipientAccountId"]
+
+def get_target_id(event):
+    """Return account id for supported events."""
+    event_name = event["detail"]["eventName"]
+    get_account_id_strategy = {
+        "CreateAccountResult": get_new_account_id,
+        "CreateOrganizationalUnit": get_create_org_target_id,
+        "InviteAccountToOrganization": get_invite_org_target_id,
+    }
+    return get_account_id_strategy[event_name](event)
 
 def replace_scp(target_id):
     """Replace scp policy from either a lambda or main method."""
