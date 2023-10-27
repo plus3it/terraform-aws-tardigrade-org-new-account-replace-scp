@@ -33,6 +33,7 @@ DETACH_SCP_ID = os.environ["DETACH_SCP_ID"]
 # Get client
 org_client = boto3.client("organizations")
 
+
 @LOG.inject_lambda_context(log_event=True)
 def lambda_handler(event, context):  # pylint: disable=unused-argument
     """Replace scp policy lambda handler."""
