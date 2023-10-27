@@ -35,7 +35,7 @@ module "lambda" {
 
   source_path = [
     {
-      path             = "${path.module}/src"
+      path             = "${path.module}/lambda/src"
       pip_requirements = true
       patterns         = ["!\\.terragrunt-source-manifest"]
     }
