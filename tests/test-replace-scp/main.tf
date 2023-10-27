@@ -16,10 +16,6 @@ module "replace_scp" {
   tags          = local.tags
 }
 
-
-data "aws_caller_identity" "current" {}
-data "aws_partition" "current" {}
-
 resource "random_string" "id" {
   length  = 6
   upper   = false
