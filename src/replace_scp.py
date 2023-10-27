@@ -33,11 +33,14 @@ DETACH_SCP_ID = os.environ["DETACH_SCP_ID"]
 # Get client
 org_client = boto3.client("organizations")
 
+
 class ReplaceSCPMaxPoliciesError(Exception):
-    """Replace SCP Error for Max Policies Attached"""
+    """Replace SCP Error for Max Policies Attached."""
+
 
 class ReplaceSCPError(Exception):
-    """All Replace SCP Errors"""
+    """All Replace SCP Errors."""
+
 
 @LOG.inject_lambda_context(log_event=True)
 def lambda_handler(event, context):  # pylint: disable=unused-argument
@@ -55,9 +58,11 @@ def get_invite_org_target_id(event):
     """Return target id for invite to org events."""
     return event["detail"]["requestParameters"]["target"]["id"]
 
+
 def get_create_org_target_id(event):
     """Return target id for create org events."""
     return event["detail"]["recipientAccountId"]
+
 
 def get_target_id(event):
     """Return account id for supported events."""
@@ -69,20 +74,19 @@ def get_target_id(event):
     }
     return get_account_id_strategy[event_name](event)
 
+
 def replace_scp(target_id):
     """Replace scp policy from either a lambda or main method."""
-
     # Determine how many policies are attached, we can have only 5 and must have 1
     response = org_client.list_policies_for_target(
         TargetId=target_id,
-        Filter='SERVICE_CONTROL_POLICY',
+        Filter="SERVICE_CONTROL_POLICY",
     )
-    num_policies = len(response['Policies'])
+    num_policies = len(response["Policies"])
     LOG.debug("Target ID %s has %s SCPs", target_id, num_policies)
 
     detach_policy = next(
-        (True for item in response['Policies'] if item["Id"] == DETACH_SCP_ID),
-        False
+        (True for item in response["Policies"] if item["Id"] == DETACH_SCP_ID), False
     )
 
     if not detach_policy:
