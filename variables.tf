@@ -23,17 +23,16 @@ variable "event_types" {
   description = "Event types that will trigger this lambda"
   type        = set(string)
   default = [
-    "CreateAccount",
-    "CreateGovCloudAccount",
+    "CreateAccountResult",
     "InviteAccountToOrganization",
     "CreateOrganizationalUnit"
   ]
 
   validation {
     condition = alltrue([for event in var.event_types : contains(
-      ["CreateAccount", "CreateGovCloudAccount", "InviteAccountToOrganization", "CreateOrganizationalUnit"], event
+      ["CreateAccountResult", "InviteAccountToOrganization", "CreateOrganizationalUnit"], event
     )])
-    error_message = "Supported event_types include only: CreateAccountResult, CreateGovCloudAccount, InviteAccountToOrganization, CreateOrganizationalUnit"
+    error_message = "Supported event_types include only: CreateAccountResult, InviteAccountToOrganization, CreateOrganizationalUnit"
   }
 }
 
