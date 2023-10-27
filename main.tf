@@ -48,7 +48,8 @@ data "aws_iam_policy_document" "lambda" {
     effect = "Allow"
     actions = [
       "organizations:DetachPolicy",
-      "organizations:AttachPolicy"
+      "organizations:AttachPolicy",
+      "organizations:ListPolicies"
     ]
 
     resources = ["*"]
