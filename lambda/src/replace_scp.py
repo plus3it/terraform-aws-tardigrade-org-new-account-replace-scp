@@ -67,12 +67,12 @@ def get_create_org_target_id(event):
 def get_target_id(event):
     """Return account id for supported events."""
     event_name = event["detail"]["eventName"]
-    get_account_id_strategy = {
+    get_target_id_strategy = {
         "CreateAccountResult": get_new_account_id,
         "CreateOrganizationalUnit": get_create_org_target_id,
         "InviteAccountToOrganization": get_invite_org_target_id,
     }
-    return get_account_id_strategy[event_name](event)
+    return get_target_id_strategy[event_name](event)
 
 
 def replace_scp(target_id):
