@@ -90,8 +90,6 @@ def replace_scp(target_id):
     )
 
     if not detach_policy:
-        if num_policies == 5:
-            raise ReplaceSCPMaxPoliciesError("Unable to find detach policy ID")
         org_client.attach_policy(PolicyId=ATTACH_SCP_ID, TargetId=target_id)
         return
 
