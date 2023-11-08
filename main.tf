@@ -50,7 +50,7 @@ data "aws_iam_policy_document" "lambda" {
       "organizations:DetachPolicy",
       "organizations:AttachPolicy",
       "organizations:ListPolicies",
-      "organizations:ListPoliciesForTarget"
+      "organizations:ListPoliciesForTarget",
     ]
 
     resources = ["*"]
