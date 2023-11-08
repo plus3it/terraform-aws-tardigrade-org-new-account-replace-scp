@@ -53,7 +53,7 @@ def get_invite_org_target_id(event):
 
 def get_create_org_target_id(event):
     """Return target id for create org events."""
-    return event["detail"]["recipientAccountId"]
+    return event["detail"]["responseElements"]["organizationalUnit"]["id"]
 
 
 def get_target_id(event):
