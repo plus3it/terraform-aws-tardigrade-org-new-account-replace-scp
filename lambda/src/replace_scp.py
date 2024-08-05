@@ -9,6 +9,7 @@ Environment Variables:
     ATTACH_SCP_ID: id of the new policy to attach
     ASSUME_ROLE_NAME: Name of role to assume
 """
+
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import os
 import sys
