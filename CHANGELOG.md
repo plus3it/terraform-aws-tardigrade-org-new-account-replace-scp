@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+### [1.0.3](https://github.com/plus3it/terraform-aws-private-nat-gateway/releases/tag/1.0.3)
+
+**Released**: 2025.05.07
+
+**Summary**:
+
+*   Updates default lambda runtime to python3.12
+
 ### [1.0.2] (<https://github.com/plus3it/terraform-aws-tardigrade-org-new-account-replace-scp/releases/tag/1.0.2>)
 
 ### 1.0.2
